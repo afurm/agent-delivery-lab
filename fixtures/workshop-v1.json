@@ -1,0 +1,84 @@
+{
+  "version": "workshop-rule-v1",
+  "rule": "Cancel an active reservation once; promote the first waiting attendee once. Replay leaves the complete state unchanged. Capacity equals active reservations plus free places.",
+  "initial": {
+    "capacity": 2,
+    "freePlaces": 0,
+    "reservations": [
+      {
+        "id": "reservation-a",
+        "attendee": "attendee-a",
+        "status": "active"
+      },
+      {
+        "id": "reservation-b",
+        "attendee": "attendee-b",
+        "status": "active"
+      }
+    ],
+    "waitlist": [
+      "attendee-c"
+    ],
+    "promotions": []
+  },
+  "steps": [
+    {
+      "check": "happy-path",
+      "cancel": "reservation-a",
+      "expected": {
+        "capacity": 2,
+        "freePlaces": 0,
+        "reservations": [
+          {
+            "id": "reservation-a",
+            "attendee": "attendee-a",
+            "status": "cancelled"
+          },
+          {
+            "id": "reservation-b",
+            "attendee": "attendee-b",
+            "status": "active"
+          },
+          {
+            "id": "promoted-attendee-c",
+            "attendee": "attendee-c",
+            "status": "active"
+          }
+        ],
+        "waitlist": [],
+        "promotions": [
+          "attendee-c"
+        ]
+      }
+    },
+    {
+      "check": "duplicate-cancellation",
+      "cancel": "reservation-a",
+      "expected": {
+        "capacity": 2,
+        "freePlaces": 0,
+        "reservations": [
+          {
+            "id": "reservation-a",
+            "attendee": "attendee-a",
+            "status": "cancelled"
+          },
+          {
+            "id": "reservation-b",
+            "attendee": "attendee-b",
+            "status": "active"
+          },
+          {
+            "id": "promoted-attendee-c",
+            "attendee": "attendee-c",
+            "status": "active"
+          }
+        ],
+        "waitlist": [],
+        "promotions": [
+          "attendee-c"
+        ]
+      }
+    }
+  ]
+}

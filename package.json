@@ -1,0 +1,31 @@
+{
+  "name": "agent-delivery-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test",
+    "demo": "node demo.mjs",
+    "smoke": "node scripts/install-smoke.mjs"
+  },
+  "description": "Portable delivery skills, local exports, and bounded evidence checks for developer projects",
+  "license": "MIT",
+  "author": "Andrii Furmanets",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afurm/agent-delivery-lab.git"
+  },
+  "homepage": "https://github.com/afurm/agent-delivery-lab#readme",
+  "bugs": {
+    "url": "https://github.com/afurm/agent-delivery-lab/issues"
+  },
+  "bin": {
+    "agent-delivery-lab": "bin/adl.mjs"
+  },
+  "exports": {
+    "./verify": "./lib/verify.mjs"
+  }
+}

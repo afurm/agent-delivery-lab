@@ -1,0 +1,122 @@
+{
+  "schema": "illustrative-evidence-v1",
+  "origin": "local deterministic execution",
+  "binding": {
+    "candidate": "fdeb5f20103877991eb351987ad70080e1e78b007ee7419905c1cbdf709cbf56",
+    "fixture": "154c710250803e11bb475bad5632705138b2700b671796e57af5c894074e9786",
+    "checks": "c0dac1613ca47cd41d5adf407a59155e1b243d58d68d61b9622912ad8086d157",
+    "evaluator": "5e821be919e801fa89f6ee2cd40e3b4a7cd79d944b9562f4debde687f2a413a7",
+    "fixtureVersion": "workshop-rule-v1",
+    "checkVersion": "full-state-checks-v1"
+  },
+  "results": [
+    {
+      "id": "happy-path",
+      "passed": true,
+      "actual": {
+        "capacity": 2,
+        "freePlaces": 0,
+        "reservations": [
+          {
+            "id": "reservation-a",
+            "attendee": "attendee-a",
+            "status": "cancelled"
+          },
+          {
+            "id": "reservation-b",
+            "attendee": "attendee-b",
+            "status": "active"
+          },
+          {
+            "id": "promoted-attendee-c",
+            "attendee": "attendee-c",
+            "status": "active"
+          }
+        ],
+        "waitlist": [],
+        "promotions": [
+          "attendee-c"
+        ]
+      },
+      "expected": {
+        "capacity": 2,
+        "freePlaces": 0,
+        "reservations": [
+          {
+            "id": "reservation-a",
+            "attendee": "attendee-a",
+            "status": "cancelled"
+          },
+          {
+            "id": "reservation-b",
+            "attendee": "attendee-b",
+            "status": "active"
+          },
+          {
+            "id": "promoted-attendee-c",
+            "attendee": "attendee-c",
+            "status": "active"
+          }
+        ],
+        "waitlist": [],
+        "promotions": [
+          "attendee-c"
+        ]
+      }
+    },
+    {
+      "id": "duplicate-cancellation",
+      "passed": false,
+      "actual": {
+        "capacity": 2,
+        "freePlaces": 1,
+        "reservations": [
+          {
+            "id": "reservation-a",
+            "attendee": "attendee-a",
+            "status": "cancelled"
+          },
+          {
+            "id": "reservation-b",
+            "attendee": "attendee-b",
+            "status": "active"
+          },
+          {
+            "id": "promoted-attendee-c",
+            "attendee": "attendee-c",
+            "status": "active"
+          }
+        ],
+        "waitlist": [],
+        "promotions": [
+          "attendee-c"
+        ]
+      },
+      "expected": {
+        "capacity": 2,
+        "freePlaces": 0,
+        "reservations": [
+          {
+            "id": "reservation-a",
+            "attendee": "attendee-a",
+            "status": "cancelled"
+          },
+          {
+            "id": "reservation-b",
+            "attendee": "attendee-b",
+            "status": "active"
+          },
+          {
+            "id": "promoted-attendee-c",
+            "attendee": "attendee-c",
+            "status": "active"
+          }
+        ],
+        "waitlist": [],
+        "promotions": [
+          "attendee-c"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "adl-manifest-v1",
+  "version": "replace-with-domain-rule-v1",
+  "candidates": [
+    "__OUT__/candidate.txt"
+  ],
+  "checks": [
+    {
+      "id": "replace-with-check-id",
+      "expected": "__OUT__/expected.json",
+      "actual": "__OUT__/actual.json"
+    }
+  ]
+}
