@@ -22,8 +22,8 @@ compatibility is not live-client certification.
   latest action versions. Reassess them before enabling CI. Checkout credentials
   are not persisted; no cache, registry authentication or dependency install runs.
 
-Only Linux/Node 24.22.3/npm 11.19.1 execution was observed. Node 22 and 24 appear
-in the proposed CI matrix but that workflow has not run on GitHub. No client was
-installed, authenticated or launched. No release or repository was created by
-this staging task. CLI layout tests do not test agent compliance, model behavior,
+Local execution was observed on Linux/Node 24.22.3/npm 11.19.1. Node 22 and 24
+appear in the CI matrix; this document makes no hosted-CI success claim. No client
+was installed, authenticated or launched during local validation. No release or
+package was published. CLI layout tests do not test agent compliance, model behavior,
 GitHub enforcement, concurrent hostile filesystem mutation or other platforms.

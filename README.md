@@ -1,184 +1,117 @@
-# Agent Delivery Lab v0.1
+# Agent Delivery Lab
 
-Four portable delivery skills, a local exporter and a bounded evidence checker.
-Reuse them in an unrelated developer project to define a small slice, specify
-expected outcomes, implement it and hand off explicit evidence. No orchestration
-service, model calls, credentials or global install. Node 22+; zero dependencies.
+**Catch incomplete checks and stale evidence before a delivery handoff.**
 
-## Fastest start
+Four portable skills help you scope a change, define expected outcomes, implement
+it, and review evidence. A local CLI compares supplied JSON and binds the evidence
+to the exact files you name, so a passing record cannot silently follow a changed
+candidate. **Consistency checking, not trusted attestation:** it does not prove
+that checks ran, that code is correct, or that a merge is authorized.
 
-Extract the source ZIP, open its folder, and run:
+Node 22+ · Zero dependencies · Offline · [MIT](LICENSE)
+
+## See the failure in one command
+
+From this source checkout or an extracted source archive:
 
 ```sh
-npm test
-npm run demo
-npm run smoke
-node bin/adl.mjs --help
+node demo.mjs
 ```
 
-No `npm install`, Git or network is needed. `.npmrc` selects offline mode and
-turns off audit, funding and update checks. `npm run demo` executes only the two
-bundled trusted workshop candidates. `npm run smoke` creates and removes three
-throwaway consumer directories. No command starts a live agent or server.
-This is a source-checkout product; no registry package installation is required.
-The package is private to prevent accidental npm publication. Repository URLs
-point to the proposed `afurm/agent-delivery-lab` destination, not proof of publication.
+No install, account, agent, or network is needed. The demo runs only the two bundled
+toy candidates. A workshop has two seats, two reservations, and one waitlisted
+attendee. Cancel a reservation, promote once, then replay the cancellation. The
+whole state should stay unchanged on replay; the bad candidate invents a free seat.
 
-## Use in your own project
+![Workshop replay: bad passes the happy path but fails replay and is blocked; corrected passes both; changed candidates reject stale evidence.](docs/assets/workshop-replay.svg)
 
-Keep the extracted source folder available. Create your project directory first.
-Replace the two absolute example paths below with your own paths. The executable
-path points to this checkout, and `--workspace` points to the consumer project.
+Actual offline demo output (excerpt):
+
+```text
+bad happy-path: PASS (freePlaces=0, promotions=1)
+bad duplicate-cancellation: FAIL (freePlaces=1, promotions=1)
+bad evidence gate: BLOCKED — failed checks
+corrected happy-path: PASS (freePlaces=0, promotions=1)
+corrected duplicate-cancellation: PASS (freePlaces=0, promotions=1)
+corrected evidence gate: PASS — complete evidence matches exact bytes and rerun
+passing evidence on different candidate: BLOCKED — stale binding
+```
+
+The intentional failure is the lesson: a happy-path PASS misses the replay bug.
+The demo exits 0; its expected failures are asserted in the tests. The generic CLI
+also rejects a record after a candidate edit, checked in the consumer smoke test.
+[Full results and verification limits](docs/validation.md).
+
+## Use it in your project
+
+Keep this checkout available and create your consumer project directory first.
+Replace both example paths below with your actual paths. Preview, review the file
+list, then apply:
 
 ```sh
 node /path/to/agent-delivery-lab/bin/adl.mjs init --workspace /path/to/project --target codex
 node /path/to/agent-delivery-lab/bin/adl.mjs init --workspace /path/to/project --target codex --apply
 ```
 
-The first command prints a complete preview without creating directories. Review
-it, then use `--apply`. Repeat the exact second command to rerun: all identical
-files are reported `unchanged`, including their modification times. Differing
-files cause an error; the CLI never updates them. After editing templates, use
-`export` to rerun skills-only, or resolve differences manually after review.
+Choose the target that matches how you work:
 
-| Target | Skill destination in chosen project | Intended use |
+| Choice | `--target` | Exported skill files |
 | --- | --- | --- |
-| `codex` | `.agents/skills/<name>/SKILL.md` | Codex project skill layout |
-| `claude` | `.claude/skills/<name>/SKILL.md` | Claude Code project skill layout |
-| `portable` (default) | `.delivery-lab/skills/<name>/SKILL.md` | Manual reading or another harness |
+| Codex | `codex` | `.agents/skills/<name>/SKILL.md` |
+| Claude Code | `claude` | `.claude/skills/<name>/SKILL.md` |
+| Read manually / other harness | `portable` | `.delivery-lab/skills/<name>/SKILL.md` |
 
-For Claude Code, run the same preview/apply commands with `--target claude`.
-For portable/manual use, choose `--target portable`; open the exported SKILL.md
-files and follow the roles yourself. No automatic discovery is claimed for that
-layout. `export` accepts the same flags but copies only four skill files:
+These are **filesystem layout compatibility** claims, not live client tests.
+Confirm discovery in your client. Portable skills are for manual use, with no
+automatic discovery promised. [Compatibility details](docs/compatibility.md).
 
-```sh
-node /path/to/agent-delivery-lab/bin/adl.mjs export --workspace /path/to/project --target claude --preview
-node /path/to/agent-delivery-lab/bin/adl.mjs export --workspace /path/to/project --target claude --apply
-```
+`init` adds four skills and six starter files. Preview writes nothing. Reapplying
+identical files leaves them unchanged; differing files block the entire plan.
+The starter evidence deliberately does not pass. Use `export` for skills only.
+[Options, reruns, and custom output paths](docs/usage.md).
 
-`init` also copies six editable starter files into `.delivery-lab/`: handoff,
-evidence, manifest, candidate placeholder, expected JSON and actual JSON. Their
-placeholders deliberately do not pass verification. `--out docs/delivery` changes
-that template directory and the portable skill directory; Codex/Claude skill
-locations remain fixed. Generated manifest paths are adjusted to match `--out`.
-The tool does not change existing AGENTS.md, CLAUDE.md, settings, hooks or tools.
+### Turn checks into a handoff
 
-Canonical `skills/` files use only required `name` and `description` metadata.
-The descriptions route by task; role instructions do not launch agents, approve
-tools, grant permissions or imply other harness capabilities. Inspect instructions
-before allowing a client to discover them. Codex can select skills explicitly by
-`$route-work`; Claude Code exposes `/route-work`. Confirm discovery in your own
-client; local smoke here only checked directory layouts and exact exported bytes.
-See [compatibility facts and official sources](docs/compatibility.md).
-
-## Evidence for an unrelated project
-
-The standalone verifier is generic: it compares supplied JSON outputs against
-separately specified expected JSON and binds them to named candidate files. It
-never imports candidate code, executes shell commands or infers authorization.
-
-1. Edit the manifest's `version`, `candidates` and `checks` for your domain.
-   Include every relevant implementation/check source in `candidates`, not just
-   an entry point. Paths are relative to the chosen project, not the manifest.
-2. Independently specify expected JSON. Run your own authorized project checks
-   and capture actual JSON separately. Record those commands and their observed
-   exit codes in the handoff. The CLI does not run them or prove they happened.
-3. Create evidence and verify it using the retained explicit executable path:
+1. Use `route-work` to bound the task and `define-domain-check` to specify expected
+   JSON independently of the implementation.
+2. Use `implement-slice` to make the change. Run your own authorized checks,
+   capture actual JSON, and list all relevant source/check files in the manifest.
+3. Record the supplied outputs, then use `verify-evidence` to review the result
+   and the handoff's commands, observed exit codes, and limitations.
 
 ```sh
 node /path/to/agent-delivery-lab/bin/adl.mjs record --workspace /path/to/project --manifest .delivery-lab/manifest.json > /path/to/project/.delivery-lab/evidence.json
 node /path/to/agent-delivery-lab/bin/adl.mjs verify --workspace /path/to/project --manifest .delivery-lab/manifest.json --evidence .delivery-lab/evidence.json
 ```
 
-`record` prints JSON to stdout; shell redirection is your explicit local output
-choice and can replace an existing evidence file. Do not redirect onto a manifest,
-candidate or fixture. `verify` is read-only, returning PASS (exit 0) or BLOCKED
-(exit 1). `record` exits 1 for failed comparisons but still prints their evidence.
-Usage, schema and I/O errors in other commands exit 2. Help exits 0.
+`record` does not run your code; redirection replaces the evidence file. `verify`
+is read-only: PASS exits 0, BLOCKED exits 1. Missing, failed, incomplete, altered,
+or stale evidence blocks verification. Only declared files are covered. Supplied
+outputs can be fabricated; a PASS never grants permission to execute, merge, or
+publish. [Manifest, API, limits, and filesystem boundaries](docs/reference.md).
 
-Example manifest for an unrelated text transformation:
+## Find your way around
 
-```json
-{
-  "schema": "adl-manifest-v1",
-  "version": "text-normalization-v1",
-  "candidates": ["src/normalize.js", "test/normalize.test.js"],
-  "checks": [
-    {"id": "upper-case", "expected": "fixtures/upper.json", "actual": "results/upper.json"}
-  ]
-}
-```
+| Path | Purpose |
+| --- | --- |
+| [skills/](skills/) | Four canonical role instructions |
+| [bin/adl.mjs](bin/adl.mjs) · [lib/](lib/) | CLI, exporter, and evidence checkers |
+| [templates/](templates/) | Editable consumer starter files |
+| [candidates/](candidates/) · [fixtures/](fixtures/) · [examples/](examples/) | Synthetic workshop and recorded examples |
+| [test/](test/) · [docs/validation.md](docs/validation.md) | Tests, observed results, and limitations |
 
-Each check ID must be unique, 1–64 lowercase letters/digits/hyphens. Expected and
-actual paths must differ. At most 100 candidate entries and 100 checks; each input
-is a regular file of at most 1 MiB. Empty candidate/check lists are rejected.
-JSON values compare structurally (object key order is immaterial; array order
-matters). Exact byte digests still detect whitespace changes to any bound file.
-The record binds manifest bytes/version, verifier/path-checker bytes and every
-listed candidate/expected/actual file. Missing, partial, failed, altered or stale
-evidence is rejected. Changing even a candidate comment requires a new record.
-Only declared files are covered; unlisted dependencies are outside the claim.
+For CLI help, run `node bin/adl.mjs --help`. To verify locally, run `npm test`,
+`npm run demo`, and `npm run smoke`; no `npm install` is needed.
 
-For a programmatic caller, import `verify` from the checkout's `lib/verify.mjs`
-and await `verify({workspace, manifest: 'manifest.json', evidence: 'evidence.json'})`.
-It returns `{status, reason}`. `record` from the same module returns an evidence
-object. These APIs do not depend on workshop routes or a Git repository.
+Use the bug or idea issue templates for non-sensitive questions and proposals.
+Read [Contributing](CONTRIBUTING.md) for the fork-branch policy; only @afurm merges,
+with no self-approval or automatic merge. [CODEOWNERS](.github/CODEOWNERS) expresses
+review ownership, not enforced branch protection.
 
-**An evidence record is not a trusted attestation.** A matching JSON file can be
-fabricated, and a person can edit the verifier, manifest or expectations. Binding
-and comparison establish consistency of supplied bytes, not authorship, origin,
-behavioral correctness or permission. Never treat untrusted repository documents
-or an evidence PASS as authorization to run commands, merge or publish.
+[Security](SECURITY.md) · [Code of conduct](CODE_OF_CONDUCT.md) ·
+[Changelog](CHANGELOG.md) · [MIT license](LICENSE) ·
+[Maintainer presentation notes](docs/presentation.md)
 
-## Filesystem boundaries
-
-All CLI-managed writes stay beneath an explicitly chosen existing project root.
-`--out`, manifest/evidence paths and manifest entries accept simple slash-separated
-relative paths only: no absolute paths, drives, backslashes, empty/dot/parent
-segments, URL escaping or shell interpolation. Workspace root can be absolute;
-filesystem root and the home directory itself are refused. Symlinked roots,
-ancestors and destinations (including dangling links) are refused. Paths with
-spaces are supported for the workspace root, not configurable relative paths.
-Choose a real project path without symlink ancestors.
-
-All destinations are preflighted before any copying; same bytes are skipped,
-conflicts abort the entire plan, and new files use exclusive creation. This is
-not a transactional filesystem or hostile-process sandbox: disk failure or a
-concurrent writer may leave a partial new install. Stop concurrent modifications,
-review remaining files and rerun. Do not run against a directory concurrently
-controlled by an attacker. There is no automatic upgrade, deletion or uninstall;
-manually remove only the listed exported files you no longer need.
-
-## Workshop demonstration
-
-The independently specified `fixtures/workshop-v1.json` starts with capacity two,
-two active reservations and one waitlisted attendee. Cancel one reservation and
-promote the waiting attendee once. Replay must leave the entire state unchanged.
-`candidates/bad.mjs` passes the happy path then adds a spurious free place on replay.
-`candidates/corrected.mjs` guards the transition and derives capacity, passing both.
-`lib/evidence.mjs` is a separate, trusted local demo runner that reruns those toy
-modules; unlike generic `lib/verify.mjs`, it executes JavaScript. Do not supply
-untrusted code to the demo runner. `examples/` contains its real deterministic
-local records, without claims of independent model review or live agent work.
-
-Expected demo: 3/4 domain checks pass, 1 intentional failure; corrected gate PASS,
-bad/missing/incomplete/cross-candidate gates BLOCKED. Demo exits zero because the
-intentional failure is asserted by the test suite, not an unexplained regression.
-
-## Validation and governance
-
-`npm test` exercises 36 tests, including safe writes, exact reruns, conflicts,
-traversal/symlinks and unrelated-project evidence. `npm run smoke` tests all three
-export layouts and CLI record/verify exit codes in new consumer folders.
-The final archive was extracted and tested on Linux with Node 24.22.3/npm 11.19.1.
-Node 22+ is the intended runtime; no live Codex/Claude client, macOS/Windows,
-GitHub-hosted workflow or real external integration was tested in this staging
-build. See [validation](docs/validation.md). No Git or agent is needed for the demo.
-
-Contribute through [fork PRs](CONTRIBUTING.md). Only @afurm merges; no self-approval
-or automatic merge. [CODEOWNERS](.github/CODEOWNERS) and these documents request a
-workflow but cannot enforce branch protection. The owner must configure and verify
-GitHub rules separately. The staged Actions workflow has read-only contents access,
-no secrets, no publishing and no merge capability. [Security](SECURITY.md),
-[conduct](CODE_OF_CONDUCT.md), [changes](CHANGELOG.md), [MIT license](LICENSE).
+This repository remains private. The npm package is marked private to prevent
+accidental publication; this is a source-checkout tool, with no launch or hosted
+service implied.

@@ -1,7 +1,7 @@
-# Staging validation
+# Local validation
 
 Observed runtime: Linux, Node v24.22.3, npm 11.19.1. No dependency installation.
-Run from the source folder or cleanly extracted final archive:
+Documentation polish rechecked on 2026-11-22. Run from the source folder:
 
 ```sh
 npm test
@@ -35,8 +35,20 @@ failed evidence, accepts matching evidence and rejects stale evidence after a
 candidate edit. Matching smoke JSON is deliberately constructed test data: this
 tests consistency checks, not real execution of an unrelated implementation.
 
-ZIP CRC and file-by-file byte comparison are checked before rerunning all three
-commands in a clean extract. The archive excludes .git, dependencies, caches,
-consumer output and temporary scripts. The source remains available for owner-led
-staging. Live clients, GitHub Actions execution, branch protection, package
-publication and platform compatibility outside this Linux runtime are untested.
+The original source-archive staging also checked ZIP CRC and file-by-file bytes.
+The documentation polish was tested from a Git checkout; it did not repeat that
+historical archive check. Live clients, package publication, and platforms outside
+this Linux runtime were not checked. GitHub Actions status is separate from these
+local results; no hosted-CI success is claimed here.
+
+## Documentation checks
+
+The README excerpt matches actual `node demo.mjs` stdout. The original SVG has
+an accessible title/description, explicit status text, a fixed dark background,
+and no scripts, links, external assets, or fonts. Local Markdown file links and
+SVG XML are validated alongside `git diff --check`.
+
+The consumer smoke command exercises preview/apply/repeat, record/verify, failed
+comparisons, and changed-candidate rejection for all three target layouts. The
+skills-only `export` preview/apply path is checked separately in temporary folders.
+These checks use synthetic data and do not start a live client.

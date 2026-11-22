@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="430" viewBox="0 0 960 430" role="img" aria-labelledby="title desc">
+  <title id="title">A passing happy path can hide a replay failure</title>
+  <desc id="desc">Synthetic workshop cancellation with two seats. The bad candidate passes the first cancellation but fails replay, so its evidence gate is blocked. The corrected candidate passes both checks and the gate. Changing the candidate invalidates the old evidence binding and blocks verification.</desc>
+  <rect width="960" height="430" rx="20" fill="#101d32"/>
+  <g font-family="system-ui, sans-serif" fill="#f5f8ff">
+    <text x="36" y="46" font-size="15" fill="#b7cbec" letter-spacing="2">AGENT DELIVERY LAB / OFFLINE WORKSHOP</text>
+    <text x="36" y="86" font-size="30" font-weight="700">One cancellation. Then the same event again.</text>
+    <text x="36" y="118" font-size="17" fill="#d4dfef">Two seats · promote the waiting attendee once · replay must preserve state</text>
+    <g font-size="15" fill="#b7cbec">
+      <text x="36" y="170">CANDIDATE</text><text x="258" y="170">HAPPY PATH</text>
+      <text x="494" y="170">REPLAY</text><text x="754" y="170">EVIDENCE GATE</text>
+    </g>
+    <path d="M36 186H924 M36 258H924 M36 330H924" stroke="#536985"/>
+    <g font-size="21" font-weight="650">
+      <text x="36" y="219">Bad</text><text x="258" y="219" fill="#a7edce">PASS</text>
+      <text x="494" y="219" fill="#ffbeaf">FAIL</text><text x="754" y="219" fill="#ffbeaf">BLOCKED</text>
+      <text x="36" y="291">Corrected</text><text x="258" y="291" fill="#a7edce">PASS</text>
+      <text x="494" y="291" fill="#a7edce">PASS</text><text x="754" y="291" fill="#a7edce">PASS</text>
+    </g>
+    <g font-size="15" fill="#d4dfef">
+      <text x="258" y="242">0 free seats</text><text x="494" y="242">1 spurious free seat</text>
+      <text x="258" y="314">0 free seats</text><text x="494" y="314">0 free seats; unchanged</text>
+    </g>
+    <text x="36" y="369" font-size="20" font-weight="650">Candidate changed + old evidence → BLOCKED: stale binding</text>
+    <text x="36" y="402" font-size="15" fill="#d4dfef">Checks supplied bytes and outcomes. Does not establish trusted attestation or merge permission.</text>
+  </g>
+</svg>
