@@ -15,14 +15,15 @@ compatibility is not live-client certification.
   (at most 1024 characters). All four canonical files satisfy this required-field
   subset, validated by the local test. No external YAML validator was installed.
 - [GitHub secure workflows](https://docs.github.com/en/actions/reference/security/secure-use)
-  explains least privilege and pinning actions. Staged CI pins official
+  explains least privilege and pinning actions. The checked-in CI workflow pins official
   [checkout](https://github.com/actions/checkout/commit/11bd71901bbe5b1630ceea73d27597364c9af683)
   and [setup-node](https://github.com/actions/setup-node/commit/49933ea5288caeca8642d1e84afbd3f7d6820020)
   commits. These explicit v4-era pins are deliberate fixed inputs, not a claim of
-  latest action versions. Reassess them before enabling CI. Checkout credentials
+  latest action versions. Reassess them during workflow maintenance. Checkout credentials
   are not persisted; no cache, registry authentication or dependency install runs.
 
-Local execution was observed on Linux/Node 24.22.3/npm 11.19.1. Node 22 and 24
+Local execution was observed on Linux/Node 22.0.0/npm 10.5.1 and
+Node 24.22.3/npm 11.19.1. Node 22 and 24
 appear in the CI matrix; this document makes no hosted-CI success claim. No client
 was installed, authenticated or launched during local validation. No release or
 package was published. CLI layout tests do not test agent compliance, model behavior,

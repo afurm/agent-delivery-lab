@@ -1,12 +1,12 @@
 // Layout/CLI smoke only: does not start Codex, Claude Code or Git.
-import { mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
+import { realpath, mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 const cli = fileURLToPath(new URL('../bin/adl.mjs', import.meta.url));
-const parent = await mkdtemp(join(tmpdir(), 'adl-smoke-'));
+const parent = await mkdtemp(join(await realpath(tmpdir()), 'adl-smoke-'));
 function run(args, expected = 0) {
  const result = spawnSync(process.execPath, [cli, ...args], { encoding: 'utf8' });
  assert.equal(result.status, expected, result.stderr || result.stdout);

@@ -79,16 +79,27 @@ The starter evidence deliberately does not pass. Use `export` for skills only.
 3. Record the supplied outputs, then use `verify-evidence` to review the result
    and the handoff's commands, observed exit codes, and limitations.
 
-```sh
-node /path/to/agent-delivery-lab/bin/adl.mjs record --workspace /path/to/project --manifest .delivery-lab/manifest.json > /path/to/project/.delivery-lab/evidence.json
-node /path/to/agent-delivery-lab/bin/adl.mjs verify --workspace /path/to/project --manifest .delivery-lab/manifest.json --evidence .delivery-lab/evidence.json
+Try the complete synthetic consumer walkthrough from a fresh checkout (Git and
+Node 22+ required). These commands work in POSIX shells, cmd and PowerShell:
+
+```text
+git clone https://github.com/afurm/agent-delivery-lab.git
+cd agent-delivery-lab
+node examples/consumer-walkthrough.mjs "consumer café"
 ```
 
-`record` does not run your code; redirection replaces the evidence file. `verify`
-is read-only: PASS exits 0, BLOCKED exits 1. Missing, failed, incomplete, altered,
-or stale evidence blocks verification. Only declared files are covered. Supplied
-outputs can be fabricated; a PASS never grants permission to execute, merge, or
-publish. [Manifest, API, limits, and filesystem boundaries](docs/reference.md).
+After clone, no network, keys, package installation or agent is needed. The script
+creates a new directory (an existing one is refused), writes and executes only its
+fixed text-normalization candidate, and writes actual JSON and evidence as UTF-8
+without shell redirection. It asserts record/verify PASS, edits the candidate, then
+asserts BLOCKED for stale evidence. Files remain for inspection. Choose another
+new directory name to rerun. Spaces and non-ASCII are supported in workspace paths.
+
+For your own project, run your authorized checks separately and use the
+[record/verify API or CLI](docs/reference.md). `record` compares supplied JSON;
+`verify` is read-only: PASS exits 0, BLOCKED exits 1. Only declared files are covered.
+Supplied outputs can be fabricated; PASS never grants permission to execute, merge
+or publish.
 
 ## Find your way around
 
@@ -112,6 +123,6 @@ review ownership, not enforced branch protection.
 [Changelog](CHANGELOG.md) · [MIT license](LICENSE) ·
 [Maintainer presentation notes](docs/presentation.md)
 
-This repository remains private. The npm package is marked private to prevent
-accidental publication; this is a source-checkout tool, with no launch or hosted
-service implied.
+This repository is public. The npm package remains marked private to prevent
+accidental registry publication. Use the source checkout; no release tag or hosted
+service is provided by this change.
