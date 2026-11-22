@@ -23,7 +23,10 @@ node /path/to/agent-delivery-lab/bin/adl.mjs verify --workspace /path/to/project
 ```
 
 `record` prints JSON to stdout; shell redirection is your explicit local output
-choice and can replace an existing evidence file. Do not redirect onto a manifest,
+choice and can replace an existing evidence file. Ensure UTF-8: Windows PowerShell
+5.1 redirection can produce UTF-16. For a shell-independent first run use the
+[consumer walkthrough](../README.md#turn-checks-into-a-handoff), which captures CLI
+stdout and writes UTF-8 via Node. Do not redirect onto a manifest,
 candidate or fixture. `verify` is read-only, returning PASS (exit 0) or BLOCKED
 (exit 1). `record` exits 1 for failed comparisons but still prints their evidence.
 Usage, schema and I/O errors in other commands exit 2. Help exits 0.
@@ -42,10 +45,22 @@ Example manifest for an unrelated text transformation:
 ```
 
 Each check ID must be unique, 1–64 lowercase letters/digits/hyphens. Expected and
-actual paths must differ. At most 100 candidate entries and 100 checks; each input
+actual paths must refer to distinct files, including case aliases and hard links. At most 100 candidate entries and 100 checks; each input
 is a regular file of at most 1 MiB. Empty candidate/check lists are rejected.
 JSON values compare structurally (object key order is immaterial; array order
-matters). Exact byte digests still detect whitespace changes to any bound file.
+matters). Numbers use exact decimal lexeme normalization: remove insignificant
+zeros and adjust a compact integer exponent, without floating-point conversion.
+For example, `1`, `1.0` and `10e-1` compare equal; numbers remain distinct from
+strings. Signed zero remains distinct (`-0` differs from `0`). Numeric tokens are
+limited to 4,096 characters; longer tokens or runtimes lacking numeric source
+text fail closed. Node 22.0.0 exposes the required JSON reviver source. Exponents
+are never expanded into zero-filled strings. JSON parsing otherwise retains
+standard semantics, including last-value-wins duplicate object keys.
+
+Exact byte digests still detect whitespace changes to any bound file.
+Existing evidence must be recorded again after upgrading because verifier and
+path-checker bindings change. The evidence schema is unchanged.
+
 The record binds manifest bytes/version, verifier/path-checker bytes and every
 listed candidate/expected/actual file. Missing, partial, failed, altered or stale
 evidence is rejected. Changing even a candidate comment requires a new record.
@@ -71,7 +86,10 @@ segments, URL escaping or shell interpolation. Workspace root can be absolute;
 filesystem root and the home directory itself are refused. Symlinked roots,
 ancestors and destinations (including dangling links) are refused. Paths with
 spaces are supported for the workspace root, not configurable relative paths.
-Choose a real project path without symlink ancestors.
+Choose a real project path without symlink ancestors. Expected/actual identity
+is checked with device/inode metadata from the same open handles used to read
+bytes; unavailable (zero inode) identity fails closed. Host identity metadata is
+not written into portable evidence.
 
 All destinations are preflighted before any copying; same bytes are skipped,
 conflicts abort the entire plan, and new files use exclusive creation. This is

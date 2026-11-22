@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm, readdir, readFile, writeFile, mkdir, symlink, stat } from 'node:fs/promises';
+import { realpath, mkdtemp, rm, readdir, readFile, writeFile, mkdir, symlink, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -9,7 +9,7 @@ import { record } from '../lib/verify.mjs';
 import { install, skillNames } from '../lib/install.mjs';
 const cli = fileURLToPath(new URL('../bin/adl.mjs', import.meta.url));
 async function sandbox(fn) {
- const workspace = await mkdtemp(join(tmpdir(), 'adl-install-'));
+ const workspace = await mkdtemp(join(await realpath(tmpdir()), 'adl-install-'));
  try { await fn(workspace); } finally { await rm(workspace, { recursive: true, force: true }); }
 }
 for (const target of ['codex', 'claude', 'portable']) {

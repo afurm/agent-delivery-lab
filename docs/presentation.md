@@ -9,7 +9,7 @@ Suggested About description (not applied to GitHub settings):
 Suggested topics (not applied): `agent-skills`, `developer-tools`, `verification`,
 `evidence`, `codex`, `claude-code`, `nodejs`, `offline`.
 These describe the content and exported layouts, not certified integrations.
-The repository remains private; these notes do not authorize a launch.
+The repository is public; the registry package remains private. These notes do not authorize a release.
 
 ## Presentation sources
 
@@ -24,7 +24,7 @@ Official project documentation reviewed on 2026-11-22 informed the organization:
 - [GitHub community profiles](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/about-community-profiles-for-public-repositories):
   retain discoverable contribution, conduct, license, security, and issue files.
   The public-repository checklist is a documentation reference, not a claim about
-  this private repository's profile or enforcement.
+  this repository's profile or enforcement.
 
 All prose and the workshop SVG were authored for this project. No wording,
 artwork, badges, or assets from these projects were copied. No endorsement,
